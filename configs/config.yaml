@@ -1,0 +1,89 @@
+# Spam Detection System Configuration
+
+# Data settings
+data:
+  seed: 42
+  train_size: 0.8
+  val_size: 0.1
+  test_size: 0.1
+  max_length: 512
+  min_length: 10
+  
+# Feature engineering
+features:
+  tfidf:
+    max_features: 10000
+    ngram_range: [1, 2]
+    min_df: 2
+    max_df: 0.95
+  text_preprocessing:
+    remove_stopwords: true
+    lemmatize: true
+    remove_punctuation: true
+    lowercase: true
+  rule_based:
+    spam_keywords: ["free", "urgent", "click", "winner", "congratulations", "limited time", "act now", "guaranteed", "no risk", "money back"]
+    suspicious_patterns: ["\\$\\d+", "\\b\\d{4,}\\b", "!!!+", "\\b[A-Z]{3,}\\b"]
+    url_pattern: "https?://[^\\s]+"
+    phone_pattern: "\\b\\d{3}[-.]?\\d{3}[-.]?\\d{4}\\b"
+
+# Model settings
+models:
+  baseline:
+    type: "naive_bayes"
+    alpha: 1.0
+  transformer:
+    model_name: "distilbert-base-uncased"
+    max_length: 512
+    batch_size: 16
+    learning_rate: 2e-5
+    num_epochs: 3
+    warmup_steps: 100
+  ensemble:
+    weights: [0.3, 0.7]  # [baseline, transformer]
+
+# Training settings
+training:
+  device: "auto"  # auto, cpu, cuda, mps
+  num_workers: 4
+  save_best_model: true
+  early_stopping_patience: 3
+  gradient_accumulation_steps: 1
+
+# Evaluation settings
+evaluation:
+  metrics:
+    - "accuracy"
+    - "precision"
+    - "recall"
+    - "f1"
+    - "auc"
+    - "aucpr"
+  threshold: 0.5
+  precision_at_k: [10, 50, 100]
+  false_positive_rate_target: 0.01
+
+# Privacy settings
+privacy:
+  differential_privacy:
+    enabled: false
+    epsilon: 1.0
+    delta: 1e-5
+  data_anonymization:
+    hash_emails: true
+    hash_ips: true
+    remove_pii: true
+
+# Logging
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  file: "logs/spam_detection.log"
+
+# Demo settings
+demo:
+  streamlit:
+    port: 8501
+    host: "localhost"
+  max_examples: 1000
+  show_explanations: true
